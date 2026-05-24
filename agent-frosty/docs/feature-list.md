@@ -172,6 +172,35 @@
 
 ---
 
+## 11. Image Catalogue
+
+| # | Feature | Description | Source | MVP | Full |
+|---|---|---|---|---|---|
+| 11.1 | Vision LLM image description | Specialist Image Description Agent uses vision LLM to auto-generate detailed descriptions of uploaded images — extracting objects, scenes, text, relationships, color palettes, composition | user request 2026-05-24 | ✓ | ✓ |
+| 11.2 | User text description update | User can create or update image descriptions via text input — supports both editing existing auto-generated descriptions and writing new ones from scratch | user request 2026-05-24 | ✓ | ✓ |
+| 11.3 | Voice description input | User can create or update image descriptions via voice recording — speech-to-text transcription mapped to description fields | user request 2026-05-24 | ✗ | ✓ |
+| 11.4 | Graph-based description storage | Descriptions stored in graph with nodes for image, description version, metadata; edges link to source file path, derived-from relationships, related images | user request 2026-05-24 | ✓ | ✓ |
+| 11.5 | Image metadata extraction | Auto-extract EXIF, camera specs, GPS location, timestamp, file format, resolution, color profile, compression — stored as graph node properties | user request 2026-05-24 | ✓ | ✓ |
+| 11.6 | Context-aware image generation | Generate new images based on combined context of metadata, descriptions, and similarity to existing images using diffusion models (Stable Diffusion, DALL-E, Midjourney) | user request 2026-05-24 | ✗ | ✓ |
+| 11.7 | Similarity-based image search | Find visually similar images via vector embedding comparison across the image catalogue | user request 2026-05-24 | ✗ | ✓ |
+| 11.8 | Image tagging & taxonomy | Auto-tag images with hierarchical taxonomy tags; user-curated tag sets; faceted tag-based filtering | user request 2026-05-24 | ✗ | ✓ |
+| 11.9 | Image versioning | Track multiple versions of the same image; provenance chain (original → edited → derived); diff view between versions | user request 2026-05-24 | ✗ | ✓ |
+| 11.10 | Provenance tracking | Record image origin (uploaded, generated, imported from tool), edit history, transformations applied, source attribution | user request 2026-05-24 | ✗ | ✓ |
+| 11.11 | Image relationship mapping | Define and visualize relationships between images: derived-from, similar-to, contains, part-of, predecessor-of | user request 2026-05-24 | ✗ | ✓ |
+| 11.12 | Bulk image import | Upload images in bulk with drag-and-drop, folder recursion, progress tracking, duplicate detection | user request 2026-05-24 | ✗ | ✓ |
+| 11.13 | Image deduplication | Perceptual hashing (pHash/dHash) to detect near-duplicate images during import and on-demand | user request 2026-05-24 | ✗ | ✓ |
+| 11.14 | Image export | Export images with metadata, descriptions, and provenance as ZIP/SQLite bundle; individual image download | user request 2026-05-24 | ✗ | ✓ |
+| 11.15 | Image grid/browser UI | Searchable, filterable grid view of catalogue with thumbnail previews, sorting, pagination, zoom | user request 2026-05-24 | ✓ | ✓ |
+| 11.16 | Metadata editor UI | Inline editor for viewing/editing all image metadata fields, description text, tags | user request 2026-05-24 | ✓ | ✓ |
+| 11.17 | Image comparison view UI | Side-by-side and overlay comparison of two or more images; metadata diff display | user request 2026-05-24 | ✗ | ✓ |
+| 11.18 | Bulk operations UI | Select multiple images for batch tag/edit/export/delete with confirmation and undo | user request 2026-05-24 | ✗ | ✓ |
+| 11.19 | Search & filter UI | Full-text search across descriptions/metadata; faceted filters by tag, date, resolution, camera, GPS location | user request 2026-05-24 | ✓ | ✓ |
+| 11.20 | Voice input UI | Microphone button on image detail view; voice recording waveform; transcription preview before save | user request 2026-05-24 | ✗ | ✓ |
+| 11.21 | Image annotation tools UI | Draw bounding boxes, arrows, text labels on images; attach annotations to specific coordinates with descriptions | user request 2026-05-24 | ✗ | ✓ |
+| 11.22 | Image generation parameters UI | Prompt builder with context injection; model selector (SD/DALL-E/Midjourney); parameter sliders (steps, guidance, seed); reference image selector; generation history | user request 2026-05-24 | ✗ | ✓ |
+
+---
+
 ## Summary Counts
 
 | Category | MVP Features | Full Features | Total |
@@ -186,4 +215,5 @@
 | 8. Security & Compliance | 0 | 4 | 4 |
 | 9. Monitoring & Observability | 1 | 3 | 4 |
 | 10. Technology Integration | 5 | 4 | 9 |
-| **Total** | **30** | **68** | **98** |
+| 11. Image Catalogue | 7 | 15 | 22 |
+| **Total** | **37** | **83** | **120** |
