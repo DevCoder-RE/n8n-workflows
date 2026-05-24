@@ -355,6 +355,92 @@ Hermes' trajectory infrastructure provides the training data pipeline.
 
 ---
 
+## Phase 8: Quotation & Proposal Management
+
+### Overview
+
+End-to-end quotation system where customers send requests via email, Slack, Discord, or Telegram; the system parses requirements, retrieves pricing from AgentDB, generates quotes via Hermes, routes through approval, delivers to customer by email, and notifies the user. Orchestrated via n8n workflows with Paperclip governance.
+
+### Architecture
+
+```
+┌──────────────────────────────────────────────────────┐
+│                  Inbound Channels                     │
+│  ┌──────┐  ┌───────┐  ┌────────┐  ┌──────────┐     │
+│  │Email │  │ Slack │  │ Discord│  │ Telegram │     │
+│  └──┬───┘  └───┬───┘  └───┬────┘  └────┬─────┘     │
+└─────┼──────────┼──────────┼─────────────┼───────────┘
+      │          │          │             │
+      ▼          ▼          ▼             ▼
+┌──────────────────────────────────────────────────────┐
+│              n8n Workflow Orchestrator                │
+│  ┌─────────┐ ┌────────┐ ┌─────────┐ ┌───────────┐   │
+│  │Request  │→│ Parse &│→│ Generate│→│ Approval  │   │
+│  │Intake   │ │ Extract│ │ Quote   │ │  Router   │   │
+│  └─────────┘ └────────┘ └─────────┘ └─────┬─────┘   │
+│                                           │         │
+│  ┌──────────┐ ┌───────────┐ ┌──────────┐ │         │
+│  │Customer  │←│ Notify    │←│  Send    │←┘         │
+│  │  Email   │ │  User     │ │  Quote   │           │
+│  └──────────┘ └───────────┘ └──────────┘           │
+└──────────────────────────────────────────────────────┘
+      │                    │
+      ▼                    ▼
+┌─────────────┐   ┌──────────────┐
+│  AgentDB    │   │  Paperclip   │
+│  (pricing,  │   │  (budgets,   │
+│  standards, │   │   approvals, │
+│  customers) │   │   audit)     │
+└─────────────┘   └──────────────┘
+```
+
+### Key Components
+
+**1. n8n Workflow Templates** — Pre-built workflows for the full quote lifecycle:
+- Inbound channel listener (email/Slack/Discord/Telegram) → normalized request
+- NLP request parsing → customer + requirements extraction
+- Hermes agent call → pricing retrieval from AgentDB → quote generation
+- Approval routing (auto-approve under threshold, manual over)
+- Email delivery to customer with PDF attachment
+- User notification via configured channel
+
+**2. Hermes Quote Agent** — Hermes skill for quote generation:
+- Retrieves pricing data, standards, prior quotes from AgentDB
+- Applies formula-based calculations from knowledge base
+- Selects and populates quote template
+- Returns structured quote JSON for n8n to deliver
+
+**3. AgentDB Knowledge for Quotes** — Extended ontology for quotation domain:
+- Customer entities (name, company, contact, communication history)
+- Product/Service entities (pricing rules, formulas, options)
+- Quote nodes (line items, totals, status, version chain)
+- Relationship types: `requests_quote`, `priced_at`, `approved_by`, `sent_to`, `responded_with`
+
+**4. Paperclip Governance** — Quote-specific governance:
+- Budget limits per agent/team enforced before quote finalization
+- Approval chains mapped to org chart
+- Full audit trail of all quote actions
+- Cost tracking per agent/team
+
+### Integration Points
+
+| Component | Integration | Purpose |
+|---|---|---|
+| n8n workflow | Hermes MCP | Trigger Hermes quote agent for pricing retrieval and generation |
+| n8n workflow | AgentDB MCP | Look up customer, pricing, prior quotes |
+| n8n workflow | Paperclip API | Check budget, log audit event, route approval |
+| Hermes quote agent | AgentDB MCP | Retrieve pricing formulas and standards |
+| Paperclip | n8n | Budget enforcement and approval routing |
+
+### Reporting & Analytics
+
+- **Quote analytics dashboard**: acceptance rates, average response time, conversion by channel, revenue pipeline
+- **Most-requested items**: ranking of products/services by quote frequency
+- **Aging report**: quotes stuck in status beyond configurable threshold
+- **Communication history**: full transcript of customer interactions stored in knowledge graph
+
+---
+
 ## Technology Stack
 
 | Layer | Technology |
@@ -372,6 +458,10 @@ Hermes' trajectory infrastructure provides the training data pipeline.
 | Multi-Platform Delivery | Hermes-native (Telegram, Discord, Slack, WhatsApp, Signal, Email, CLI) |
 | Scheduled Tasks | Hermes-native cron |
 | Skill Format | agentskills.io open standard |
+| Quotation Workflows | n8n (workflow templates for inbound intake, parsing, approval, delivery, notification) |
+| Quote Generation | Hermes skill + AgentDB MCP (pricing retrieval, template population) |
+| Quote Delivery | Hermes email gateway (customer) + multi-platform notifications (user) |
+| Quote Governance | Paperclip (budget limits, approval chains, audit) |
 
 ---
 
@@ -409,19 +499,27 @@ Hermes' trajectory infrastructure provides the training data pipeline.
 14. Add Reasoning Agent Hermes skill (graph traversal, constraint checks)
 15. Parent agent workflow: intent → spawn subagents → aggregate → report
 
-### Week 4: Report Generation + Delivery
+### Week 4: Report Generation + Delivery + Quote MVP
 16. Add Report Writer Hermes skill with domain-specific templates
 17. Configure multi-platform delivery (Telegram, Slack, or email)
 18. Set up scheduled reports via Hermes cron
 19. Run 50+ test queries, iterate on failures
-20. Train Hermes on successful trajectories (automatic via built-in learning loop)
+20. Configure inbound quote channels (email + Slack listeners)
+21. Build n8n quote intake workflow (parse → generate → approve → deliver)
+22. Create Hermes quote generation skill (pricing retrieval + template population)
+23. Build approval workflow engine (threshold routing)
+24. Configure customer email delivery and user notifications
+25. Train Hermes on successful trajectories (automatic via built-in learning loop)
 
-### Week 5+: Production + Polish
-21. Add Paperclip governance layer (mission, budgets, dashboard)
-22. Scale ingestion to full document corpus
-23. Production deployment (Hermes supports Docker, Modal, Daytona, SSH)
-24. Automated faithfulness evaluation
-25. Consider LoRA fine-tuning for report style (if 1000+ examples available)
+### Week 5+: Production + Polish + Quote Full
+26. Add Paperclip governance layer (mission, budgets, dashboard)
+27. Add Paperclip quote governance (budget limits, approval chains, audit)
+28. Build quote analytics dashboard (acceptance rates, revenue pipeline)
+29. Scale ingestion to full document corpus
+30. Production deployment (Hermes supports Docker, Modal, Daytona, SSH)
+31. Automated faithfulness evaluation
+32. Add CRM sync (HubSpot/Salesforce) via n8n
+33. Consider LoRA fine-tuning for report style (if 1000+ examples available)
 
 ---
 
@@ -437,3 +535,6 @@ Hermes' trajectory infrastructure provides the training data pipeline.
 8. **No fine-tuning first**: Expertise comes from prompt architecture + graph constraints + tool-augmented reasoning
 9. **Conflict detection at ingest**: Surface contradictions early; turn the system into an active knowledge validator
 10. **MMR for diversity**: Maximal Marginal Relevance ensures the Reasoning Agent sees multiple perspectives
+11. **n8n for quotation workflows**: n8n is ideal for the quote lifecycle because it handles multi-channel inbound/outbound, conditional routing (approval), and API integration (email, Slack, Paperclip) visually — exactly the kind of process workflow Hermes is not designed for
+12. **Hermes for quote intelligence**: Hermes handles the cognitive parts (parsing requests, retrieving knowledge, generating structured quotes) while n8n handles the procedural parts (listening, routing, delivering)
+13. **Quote-specific AgentDB ontology**: Customers, products/pricing, and quote history stored in the same knowledge graph as domain knowledge, enabling cross-domain reasoning (e.g., "does this design constraint affect the quote?")

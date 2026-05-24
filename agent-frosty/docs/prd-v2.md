@@ -73,6 +73,7 @@ The MVP proves the core loop: **ingest → store → retrieve → generate answe
 - Audio/video processing
 - Multi-platform delivery (Telegram, Slack, etc.)
 - Production deployment (Docker, Modal, etc.)
+- Quotation & Proposal Management
 
 ### 2.2 Full Project Scope
 
@@ -90,6 +91,7 @@ The MVP proves the core loop: **ingest → store → retrieve → generate answe
 | Orchestration | Manual Hermes tool calls | Paperclip org chart + budgets + audit + cron scheduling |
 | n8n | None | MCP-connected pipeline tool for visual workflow stages |
 | Fine-tuning | None | Report Writer only (LoRA, optional) |
+| Quotation & Proposal | None | Multi-channel inbound, knowledge-backed generation, approval workflow, email delivery, user notifications, analytics, Paperclip governance, CRM sync |
 
 ---
 
@@ -529,6 +531,75 @@ The MVP proves the core loop: **ingest → store → retrieve → generate answe
 
 ---
 
+### Epic 10: Quotation & Proposal Management
+
+**Description**: End-to-end quotation and proposal system — customers send requests via email, Slack, Discord, or Telegram; the system parses requirements, retrieves pricing from AgentDB, generates quotes/proposals via Hermes, routes through approval, delivers to customer by email, and notifies the user via their configured channels. Orchestrated via n8n workflows with Paperclip governance.  
+**Priority**: P1 (Full Scope)  
+**Estimated Effort**: 5-8 days
+
+#### Story 10.1: Multi-Channel Inbound Request Intake
+*As a customer, I want to send a quote request via email, Slack, Discord, or Telegram so that the system automatically receives and processes it.*
+
+| ID | Task | Description | Effort |
+|---|---|---|---|
+| 10.1.1 | Email inbound listener | Configure IMAP/webhook monitoring for quote request emails; parse sender, subject, body, attachments | 3h |
+| 10.1.2 | Slack inbound listener | Configure Slack app event subscription for DMs and channel messages with quote intent | 3h |
+| 10.1.3 | Discord inbound listener | Configure Discord bot for quote requests in designated channel or DMs | 3h |
+| 10.1.4 | Telegram inbound listener | Configure Telegram bot for quote requests | 3h |
+| 10.1.5 | Unified request queue | Store all inbound requests in a normalized format with channel attribution; deduplicate cross-channel | 2h |
+
+#### Story 10.2: Request Parsing & Quote Generation
+*As a user, I want the system to automatically extract customer details and requirements, then generate a quote backed by my knowledge base.*
+
+| ID | Task | Description | Effort |
+|---|---|---|---|
+| 10.2.1 | NLP request parsing | Extract customer name, company, contact info, requirements, quantities, deadlines using LLM | 4h |
+| 10.2.2 | Attachment processing | Classify and store attachments (specs, RFQs, reference images); link to request | 2h |
+| 10.2.3 | Pricing knowledge retrieval | Hermes agent queries AgentDB for pricing data, standards, prior quote references | 3h |
+| 10.2.4 | Quote generation prompt | Hermes skill prompt for generating structured quotes with line items, pricing, terms | 4h |
+| 10.2.5 | Quote template system | Configurable templates for standard quote, detailed proposal, RFP response with branding | 3h |
+
+#### Story 10.3: Approval, Delivery & Notifications
+*As a user, I want to approve quotes before sending, have them delivered to the customer by email, and receive status updates on my preferred channels.*
+
+| ID | Task | Description | Effort |
+|---|---|---|---|
+| 10.3.1 | Approval workflow engine | Configurable routing: auto-approve under threshold, route to specific approvers, escalation timer | 4h |
+| 10.3.2 | Customer email delivery | Send branded HTML email with PDF attachment; track delivery, opens, bounces | 3h |
+| 10.3.3 | User notification dispatch | Notify user of status changes (received, drafted, approved, sent, customer replied) via configured channels | 3h |
+| 10.3.4 | Quote status lifecycle | State machine: received → drafting → pending_approval → sent → viewed → accepted/rejected → revised | 2h |
+
+#### Story 10.4: n8n Workflow Orchestration
+*As a developer, I want the full quote lifecycle implemented as n8n workflows so that it can be visually managed and customized.*
+
+| ID | Task | Description | Effort |
+|---|---|---|---|
+| 10.4.1 | Quotation workflow template | n8n workflow: inbound listener → parse → generate → approval → deliver → notify | 4h |
+| 10.4.2 | n8n-Hermes MCP integration | Connect n8n to Hermes via MCP for agent-driven pricing retrieval and quote generation | 2h |
+| 10.4.3 | n8n-Paperclip integration | Connect n8n to Paperclip for budget checks and audit logging | 2h |
+
+#### Story 10.5: Quote Analytics & CRM Integration (Full Scope)
+*As a manager, I want visibility into quote performance and optional sync with my CRM.*
+
+| ID | Task | Description | Effort |
+|---|---|---|---|
+| 10.5.1 | Quote analytics dashboard | Acceptance rates, response times, conversion by channel, revenue pipeline | 3h |
+| 10.5.2 | Quote versioning | Revision tracking with audit trail and diff view | 2h |
+| 10.5.3 | Customer communication history | Full transcript of all customer interactions stored in graph | 3h |
+| 10.5.4 | CRM sync (HubSpot/Salesforce) | Bidirectional sync of customers, quotes, and status with external CRM | 4h |
+
+#### Story 10.6: Paperclip Governance for Quotes (Full Scope)
+*As a finance manager, I want budget limits, approval chains, and audit trails on all quote actions.*
+
+| ID | Task | Description | Effort |
+|---|---|---|---|
+| 10.6.1 | Budget limits per quote | Enforce per-agent/team budget caps; flag over-budget for special approval | 2h |
+| 10.6.2 | Approval chain mapping | Map quote approval hierarchy to Paperclip org chart | 2h |
+| 10.6.3 | Quote audit trail | All quote actions logged to Paperclip audit with full provenance | 2h |
+| 10.6.4 | Cost tracking per agent | Track total quote value generated by each agent/team | 1h |
+
+---
+
 ## 4. Release Plan
 
 ### Release 1 (MVP) — Weeks 1-2
@@ -552,11 +623,11 @@ The MVP proves the core loop: **ingest → store → retrieve → generate answe
 - ≥80% citation accuracy on test queries
 - Agent Frosty context file loaded and effective
 
-### Release 2 (Multimodal + Specialist Skills) — Weeks 3-4
+### Release 2 (Multimodal + Specialist Skills + Quote MVP) — Weeks 3-4
 
-**Goal**: Add multimodal ingestion and full specialist skill set on Hermes.
+**Goal**: Add multimodal ingestion, full specialist skill set, and basic quotation flow on Hermes.
 
-**New epics**: Epic 2 Stories 2.2-2.5, Epic 4 Stories 4.2-4.6, Epic 5 (Expert Reasoning)
+**New epics**: Epic 2 Stories 2.2-2.5, Epic 4 Stories 4.2-4.6, Epic 5 (Expert Reasoning), Epic 10 Stories 10.1-10.4 (Quote MVP)
 
 **Deliverables:**
 - Diagram ingestion (vision → symbolic graph) as Hermes skill
@@ -565,6 +636,12 @@ The MVP proves the core loop: **ingest → store → retrieve → generate answe
 - Parent agent workflow: intent → spawn skills → aggregate → report
 - Multi-platform delivery (Telegram or Slack)
 - Hermes built-in learning loop active
+- Multi-channel quote request intake (email + 1 chat platform)
+- Knowledge-backed quote generation with templates
+- Approval workflow (auto-approve under threshold, manual approval over)
+- Customer email delivery with PDF attachment
+- User notifications via configured channel
+- n8n workflow template for basic quote lifecycle
 
 **Acceptance criteria:**
 - Diagram → symbolic graph accuracy ≥90%
@@ -572,12 +649,14 @@ The MVP proves the core loop: **ingest → store → retrieve → generate answe
 - Skills spawn as subagents for parallel work
 - Reports delivered to at least one non-CLI platform
 - Hermes automatically records trajectories and creates skills from experience
+- Quote requests accepted via email and Slack, quotes generated and sent to customer
+- Approval workflow routes correctly based on configurable threshold
 
-### Release 3 (Governance + Evaluation + Production) — Week 5+
+### Release 3 (Governance + Evaluation + Production + Quote Full) — Week 5+
 
-**Goal**: Governance, quality measurement, and production deployment.
+**Goal**: Governance, quality measurement, production deployment, and full quotation features.
 
-**New epics**: Epic 6 (Evaluation), Epic 7 (Orchestration & Governance), Epic 8 (Learning), Epic 9 (Production)
+**New epics**: Epic 6 (Evaluation), Epic 7 (Orchestration & Governance), Epic 8 (Learning), Epic 9 (Production), Epic 10 Stories 10.5-10.6 (Quote Full)
 
 **Deliverables:**
 - Paperclip governance layer (org chart, budgets, audit)
@@ -585,14 +664,18 @@ The MVP proves the core loop: **ingest → store → retrieve → generate answe
 - Report quality rubric and expert review process
 - Scheduled reports via Hermes cron
 - Production deployment on Hermes-supported infra (Docker, Modal, or SSH)
-- Optional: n8n MCP integration, FastAPI backend, LoRA fine-tuning
+- Paperclip governance for quotes (budget limits, approval chains, audit trails)
+- Quote analytics dashboard (acceptance rates, conversion by channel, revenue pipeline)
+- Customer communication history stored in knowledge graph
+- Optional: CRM sync (HubSpot/Salesforce), n8n MCP integration, FastAPI backend, LoRA fine-tuning
 
 **Acceptance criteria:**
 - 100% faithfulness on automated checks
 - Report quality ≥4/5 on expert rubric
-- Paperclip dashboard shows agent activity, budgets, and audit log
+- Paperclip dashboard shows agent activity, budgets, audit log, and quote metrics
 - System recovers gracefully from agent failures
 - Cron-delivered reports reach the right platforms
+- Quote budget limits enforced; over-budget quotes routed for special approval
 
 ---
 

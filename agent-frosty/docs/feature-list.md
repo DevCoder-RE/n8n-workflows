@@ -201,6 +201,27 @@
 
 ---
 
+## 12. Quotation & Proposal Management
+
+| # | Feature | Description | Source | MVP | Full |
+|---|---|---|---|---|---|
+| 12.1 | Multi-channel inbound requests | Receive quote/proposal requests via email, Slack, Discord, and Telegram — unified inbox with channel attribution | user request 2026-05-24 | ✓ | ✓ |
+| 12.2 | Request parsing & intent extraction | Parse incoming messages to extract customer details, requirements, quantities, deadlines, attachments; classify request type (quote, proposal, RFP response) | user request 2026-05-24 | ✓ | ✓ |
+| 12.3 | Knowledge-backed quote generation | Generate quotes using Hermes agent with retrieval from AgentDB — pricing data, standards, prior quotes, component costs, formula-based calculations | user request 2026-05-24 | ✓ | ✓ |
+| 12.4 | Quote/proposal templates | Configurable templates for different quote types, proposal formats, and RFP responses; domain-specific formatting and compliance language | user request 2026-05-24 | ✓ | ✓ |
+| 12.5 | Approval workflow | Optional routing: draft → user approval → send; configurable approvers, thresholds (auto-approve under $X), rejection with revision notes | user request 2026-05-24 | ✓ | ✓ |
+| 12.6 | Email delivery to customer | Send generated quotes/proposals to customer email with branded formatting, PDF attachment, and tracked delivery status | user request 2026-05-24 | ✓ | ✓ |
+| 12.7 | Multi-channel user notifications | Notify the internal user of status changes (request received, quote drafted, approved, sent, customer responded) via their configured channels (email, Slack, Discord, Telegram) | user request 2026-05-24 | ✓ | ✓ |
+| 12.8 | Quote status lifecycle | Track full lifecycle: received → drafting → pending_approval → sent → viewed → accepted → rejected → revised; status visible in UI and notifications | user request 2026-05-24 | ✓ | ✓ |
+| 12.9 | Quote versioning | Track revisions; each edit creates a new version; full audit trail of who changed what and when; compare versions | user request 2026-05-24 | ✗ | ✓ |
+| 12.10 | Customer communication history | Full transcript of all communications with a customer stored in graph — inbound requests, outbound quotes, follow-ups, revisions — linked to customer node | user request 2026-05-24 | ✗ | ✓ |
+| 12.11 | Quote analytics dashboard | Acceptance rates, average response time, conversion by channel, revenue pipeline, most-requested items | user request 2026-05-24 | ✗ | ✓ |
+| 12.12 | n8n workflow templates | Pre-built n8n workflows covering the full quote lifecycle: inbound channel listener → parsing → knowledge retrieval → generation → approval → delivery → notification | user request 2026-05-24 | ✓ | ✓ |
+| 12.13 | Paperclip governance integration | Budget limits per quote, approval chains mapped to org chart, full audit trail of all quote actions, cost tracking | user request 2026-05-24 | ✗ | ✓ |
+| 12.14 | CRM integration (optional) | Sync customers, quotes, and status with external CRM (HubSpot, Salesforce) via API or n8n | user request 2026-05-24 | ✗ | ✓ |
+
+---
+
 ## Summary Counts
 
 | Category | MVP Features | Full Features | Total |
@@ -216,4 +237,5 @@
 | 9. Monitoring & Observability | 1 | 3 | 4 |
 | 10. Technology Integration | 5 | 4 | 9 |
 | 11. Image Catalogue | 7 | 15 | 22 |
-| **Total** | **37** | **83** | **120** |
+| 12. Quotation & Proposal Management | 8 | 6 | 14 |
+| **Total** | **45** | **89** | **134** |

@@ -2352,3 +2352,306 @@ Image catalogue system for ingesting, describing, organizing, searching, generat
 - Generation history with prompt, parameters, results
 - One-click regeneration with different seed
 - Generated images auto-saved to catalogue
+
+---
+
+## 12. Quotation & Proposal Management
+
+### Overview
+End-to-end quotation and proposal management system. Customers send requests via email, Slack, Discord, or Telegram; the system parses requirements, retrieves knowledge from AgentDB, generates quotes/proposals using Hermes, routes through an approval workflow, delivers to the customer by email, and keeps the internal user notified via their configured channels.
+
+### Features
+
+---
+
+#### 12.1 Multi-Channel Inbound Requests
+
+**Description**: Receive quote/proposal requests via email, Slack, Discord, and Telegram — unified inbox with channel attribution.
+
+**Priority**: MVP
+
+**Dependencies**: 5.12, 5.13, 5.14, 5.15 (delivery channels — reused for inbound)
+
+**User Stories**:
+- As a customer, I want to send a quote request via email and have it automatically picked up by the system
+- As a customer, I want to send a quote request via Slack, Discord, or Telegram and get the same experience
+- As a user, I want all inbound requests visible in a single unified inbox regardless of source channel
+
+**Acceptance Criteria**:
+- Email inbox monitored (IMAP or webhook) for quote requests; emails parsed for sender, subject, body, attachments
+- Slack app/DM monitored for quote requests; messages parsed for intent, requirements, file attachments
+- Discord bot monitored for quote requests in designated channel or DM
+- Telegram bot monitored for quote requests
+- All requests stored in a unified queue with channel attribution tag
+- Duplicate detection: same customer sending via multiple channels merged to single request
+
+---
+
+#### 12.2 Request Parsing & Intent Extraction
+
+**Description**: Parse incoming messages to extract customer details, requirements, quantities, deadlines, attachments; classify request type (quote, proposal, RFP response).
+
+**Priority**: MVP
+
+**Dependencies**: 12.1
+
+**User Stories**:
+- As a user, I want the system to automatically extract customer name, contact info, and requirements from the inbound message
+- As a user, I want attachments on the request (specs, RFQ documents) automatically processed and linked
+
+**Acceptance Criteria**:
+- NLP extraction of: customer name, email, company, phone, project description, quantities, required delivery date
+- Attachments classified (spec sheet, RFQ, reference image) and linked to request
+- Request type classification: quote (simple pricing), proposal (detailed solution), RFP response (formal tender)
+- Confidence score per extracted field; low-confidence fields flagged for manual review
+- Extraction failures logged with raw message preserved for manual handling
+
+---
+
+#### 12.3 Knowledge-Backed Quote Generation
+
+**Description**: Generate quotes using Hermes agent with retrieval from AgentDB — pricing data, standards, prior quotes, component costs, formula-based calculations.
+
+**Priority**: MVP
+
+**Dependencies**: 12.2, 1.7 (AgentDB MCP), 3.1 (Hermes)
+
+**User Stories**:
+- As a user, I want the system to automatically generate a quote based on the customer's requirements and my configured pricing data
+- As a user, I want the system to reference previous similar quotes for consistency
+
+**Acceptance Criteria**:
+- Hermes agent retrieves relevant pricing data from AgentDB based on extracted requirements
+- Prior quotes searched for similar requests and used as reference
+- Formula-based calculations applied where pricing formulas exist in knowledge base
+- Generated quote includes: line items with descriptions, quantities, unit prices, totals, terms, validity period
+- All pricing decisions traceable to source data in AgentDB (provenance)
+- Quote generated in under 60 seconds from request receipt
+
+---
+
+#### 12.4 Quote/Proposal Templates
+
+**Description**: Configurable templates for different quote types, proposal formats, and RFP responses; domain-specific formatting and compliance language.
+
+**Priority**: MVP
+
+**Dependencies**: 12.3
+
+**User Stories**:
+- As a user, I want different templates for simple quotes vs detailed proposals vs formal RFP responses
+- As a user, I want to customize templates with my company branding, terms, and boilerplate language
+
+**Acceptance Criteria**:
+- Template library with minimum 3 templates: standard quote, detailed proposal, RFP response
+- Templates support variables (customer name, date, line items, totals) that are auto-populated
+- Company branding (logo, colors, disclaimer) configurable per template
+- Compliance boilerplate auto-inserted based on request type and jurisdiction
+- Users can create and edit templates via configuration
+
+---
+
+#### 12.5 Approval Workflow
+
+**Description**: Optional routing: draft → user approval → send; configurable approvers, thresholds (auto-approve under $X), rejection with revision notes.
+
+**Priority**: MVP
+
+**Dependencies**: 12.3
+
+**User Stories**:
+- As a manager, I want quotes over a certain value to require my approval before being sent
+- As a user, I want to review and approve/reject quotes from my notification channel
+
+**Acceptance Criteria**:
+- Approval routing configurable: auto-approve under threshold, route to specific approver(s) over threshold
+- Approval request sent to approver via their configured notification channel (see 12.7)
+- Approver can approve, reject with notes, or request revision
+- Rejected quotes return to drafting state with revision notes attached
+- Approval history logged for audit
+- Escalation if approver does not respond within configurable timeout
+
+---
+
+#### 12.6 Email Delivery to Customer
+
+**Description**: Send generated quotes/proposals to customer email with branded formatting, PDF attachment, and tracked delivery status.
+
+**Priority**: MVP
+
+**Dependencies**: 12.3, 5.15
+
+**User Stories**:
+- As a customer, I want to receive the quote as a professional, branded email with a PDF attachment
+- As a user, I want to know when the customer has received and opened the quote
+
+**Acceptance Criteria**:
+- Quote rendered as HTML email with company branding
+- PDF attachment of the full quote/proposal generated automatically
+- Delivery tracking: sent, delivered, opened, bounced
+- Bounce handling: auto-notify user, flag for alternative delivery
+- Email sent from configured sender address (e.g., quotes@company.com)
+
+---
+
+#### 12.7 Multi-Channel User Notifications
+
+**Description**: Notify the internal user of status changes (request received, quote drafted, approved, sent, customer responded) via their configured channels (email, Slack, Discord, Telegram).
+
+**Priority**: MVP
+
+**Dependencies**: 12.1, 12.3, 12.5, 12.6
+
+**User Stories**:
+- As a user, I want to be notified on Slack when a new quote request arrives
+- As a user, I want to receive status updates on my quote via Telegram so I can approve/reject on the go
+
+**Acceptance Criteria**:
+- User-configurable notification preferences: which events trigger notification, which channel(s)
+- Notification events: request received, quote drafted, pending approval, approved, sent, delivered, opened, customer replied
+- Notifications include: request ID, customer name, amount, status, action link (if applicable)
+- Channel-specific formatting: Slack rich message, Discord embed, Telegram formatted text, email summary
+
+---
+
+#### 12.8 Quote Status Lifecycle
+
+**Description**: Track full lifecycle: received → drafting → pending_approval → sent → viewed → accepted → rejected → revised; status visible in UI and notifications.
+
+**Priority**: MVP
+
+**Dependencies**: 12.1, 12.3, 12.5, 12.6
+
+**User Stories**:
+- As a user, I want to see the current status of every quote at a glance
+- As a user, I want status changes to trigger appropriate notifications
+
+**Acceptance Criteria**:
+- Status machine: received → drafting → pending_approval → sent → viewed → accepted/rejected/expired → (if rejected) → revised
+- Status transitions logged with timestamp and actor
+- Dashboard or CLI command shows all quotes grouped by status
+- Aging report: quotes stuck in a status beyond configurable threshold flagged
+
+---
+
+#### 12.9 Quote Versioning
+
+**Description**: Track revisions; each edit creates a new version; full audit trail of who changed what and when; compare versions.
+
+**Priority**: Full
+
+**Dependencies**: 12.3
+
+**User Stories**:
+- As a user, I want to see the revision history of a quote so I can track changes
+- As a manager, I want to compare different versions of a quote to see what was changed
+
+**Acceptance Criteria**:
+- Each save/edit creates a new version with incrementing version number
+- Version metadata: timestamp, editor, change summary, status at version
+- Diff view between any two versions showing line-item, pricing, and terms changes
+- Full audit trail queryable by quote ID
+
+---
+
+#### 12.10 Customer Communication History
+
+**Description**: Full transcript of all communications with a customer stored in graph — inbound requests, outbound quotes, follow-ups, revisions — linked to customer node.
+
+**Priority**: Full
+
+**Dependencies**: 12.1, 12.6, 1.1
+
+**User Stories**:
+- As a user, I want to see the complete communication history with a customer in one place
+- As a manager, I want to review all interactions for quality assurance
+
+**Acceptance Criteria**:
+- All customer-facing communications stored as nodes in the knowledge graph
+- Nodes linked to customer entity via `customer_of` relationship
+- Communication types: inbound_request, outbound_quote, follow_up, revision, status_update
+- Each node stores: timestamp, channel, content summary, attachments, agent/user attribution
+- History queryable by customer, date range, communication type
+
+---
+
+#### 12.11 Quote Analytics Dashboard
+
+**Description**: Acceptance rates, average response time, conversion by channel, revenue pipeline, most-requested items.
+
+**Priority**: Full
+
+**Dependencies**: 12.8
+
+**User Stories**:
+- As a manager, I want to see how many quotes are being accepted vs rejected
+- As a sales manager, I want to know which channels generate the most valuable leads
+
+**Acceptance Criteria**:
+- Metrics: acceptance rate, average response time (request to send), average quote value, conversion by channel
+- Revenue pipeline view: total value of quotes by status (draft, sent, accepted)
+- Most-requested products/services ranking
+- Trend view over configurable time periods (7d, 30d, 90d)
+- Data exportable as CSV
+
+---
+
+#### 12.12 n8n Workflow Templates
+
+**Description**: Pre-built n8n workflows covering the full quote lifecycle: inbound channel listener → parsing → knowledge retrieval → generation → approval → delivery → notification.
+
+**Priority**: MVP
+
+**Dependencies**: 7.9, 12.1–12.7
+
+**User Stories**:
+- As a workflow designer, I want pre-built n8n templates that I can customize for my quote process
+- As a developer, I want to see the full quote flow as a visual n8n workflow
+
+**Acceptance Criteria**:
+- Minimum 3 n8n workflow templates: full lifecycle, approval-only, notification-only
+- Templates include nodes for: channel listener (email/Slack/Discord/Telegram), LLM parsing, Hermes agent call, email delivery, notification dispatch
+- Templates are documented with input/output specifications
+- Templates importable into n8n with one command
+- Templates can be modified and extended by users
+
+---
+
+#### 12.13 Paperclip Governance Integration
+
+**Description**: Budget limits per quote, approval chains mapped to org chart, full audit trail of all quote actions, cost tracking.
+
+**Priority**: Full
+
+**Dependencies**: 7.2, 12.5
+
+**User Stories**:
+- As a finance manager, I want budget limits enforced on quote values
+- As a compliance officer, I want a full audit trail of every quote action
+
+**Acceptance Criteria**:
+- Paperclip org chart defines approval hierarchy for quotes
+- Per-agent or per-team budget limits enforced; quotes over budget flagged and routed for special approval
+- Every quote action (create, edit, approve, send, reject) logged to Paperclip audit
+- Cost tracking: total value of quotes sent, accepted, by agent/team
+
+---
+
+#### 12.14 CRM Integration (Optional)
+
+**Description**: Sync customers, quotes, and status with external CRM (HubSpot, Salesforce) via API or n8n.
+
+**Priority**: Full
+
+**Dependencies**: 12.8
+
+**User Stories**:
+- As a sales user, I want quotes generated in Agent Frosty to appear in my CRM automatically
+- As a manager, I want quote status to sync back from CRM to keep both systems consistent
+
+**Acceptance Criteria**:
+- Integration with HubSpot and Salesforce (configurable)
+- Sync: create/update contact, create deal/opportunity, attach quote document
+- Bidirectional status sync: CRM status changes reflected in Agent Frosty
+- Sync configurable (real-time or periodic)
+- Sync failures logged with retry logic

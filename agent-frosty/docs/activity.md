@@ -170,6 +170,57 @@ User challenged the n8n-heavy approach and suggested evaluating four alternative
 
 ---
 
+## Iteration 7: Quotation & Proposal Management Feature
+
+**Date**: 2026-05-24
+
+### What Was Done
+
+1. **Updated all four planning documents** with new Quotation & Proposal Management feature (category 12):
+
+2. **`feature-list.md`** — added category 12 with 14 features (8 MVP, 6 Full):
+   - Multi-channel inbound requests (email, Slack, Discord, Telegram)
+   - Request parsing & intent extraction
+   - Knowledge-backed quote generation via Hermes + AgentDB
+   - Quote/proposal templates, approval workflow
+   - Email delivery to customer, multi-channel user notifications
+   - Quote status lifecycle, versioning, analytics dashboard
+   - Customer communication history, n8n workflow templates
+   - Paperclip governance integration, CRM sync (optional)
+   - Summary counts updated: 120 → 134 total features (45 MVP, 89 Full)
+
+3. **`requirements.md`** — added category 12 with 14 detailed feature specs:
+   - Each feature includes: description, priority, dependencies, user stories, acceptance criteria
+   - Full coverage of: inbound channels, NLP parsing, pricing retrieval, generation, templates, approval routing, email delivery, notifications, status lifecycle, versioning, analytics, n8n workflows, Paperclip governance, CRM sync
+
+4. **`prd-v2.md`** — added Epic 10 with 6 stories and 25 tasks:
+   - Story 10.1: Multi-channel inbound request intake (email, Slack, Discord, Telegram)
+   - Story 10.2: Request parsing & quote generation (NLP, pricing retrieval, templates)
+   - Story 10.3: Approval, delivery & notifications (approval engine, email, user notifications)
+   - Story 10.4: n8n workflow orchestration (workflow templates, Hermes/Paperclip integration)
+   - Story 10.5: Quote analytics & CRM integration (analytics, versioning, comms history, CRM sync)
+   - Story 10.6: Paperclip governance for quotes (budget limits, approval chains, audit)
+   - Release plan updated: Quote MVP added to Release 2, full quote features to Release 3
+   - Scope table updated with Quotation row
+
+5. **`implementation-plan-v2.md`** — added Phase 8 with:
+   - Full architecture diagram for the quotation system
+   - Key components: n8n workflows, Hermes quote agent, AgentDB quote ontology, Paperclip governance
+   - Integration points table (n8n ↔ Hermes, AgentDB, Paperclip)
+   - Reporting & analytics section
+   - Technology stack updated with quote entries
+   - Roadmap updated: Weeks 4-5 include quote intake, n8n workflow, Hermes quote skill, approval engine, and Paperclip governance
+   - Added 3 new design decisions (D011-D013)
+
+### Key Decisions Made
+- **n8n for quotation workflows**: n8n handles multi-channel inbound/outbound, conditional routing, and API integrations visually — ideal for process workflows
+- **Hermes for quote intelligence**: Hermes handles cognitive parts (parsing, knowledge retrieval, generation); n8n handles procedural parts (listening, routing, delivering)
+- **Quote ontology in AgentDB**: Customers, pricing, and quote history stored in the same knowledge graph as domain knowledge for cross-domain reasoning
+- Quote MVP (Release 2) includes: email + Slack intake, basic generation, approval, email delivery, notifications
+- Quote Full (Release 3) adds: Paperclip governance, analytics, versioning, CRM sync
+
+---
+
 ## Document Inventory
 
 | File | Version | Status | Description |
@@ -181,6 +232,6 @@ User challenged the n8n-heavy approach and suggested evaluating four alternative
 | `prd-v2.md` | v2 | Current | Hermes/Paperclip product requirements |
 | `discussions.md` | — | Current | Architecture decisions and trade-off analysis |
 | `README.md` | — | Current | Repository README |
-| `feature-list.md` | — | Current | Comprehensive feature list (120 features, 37 MVP / 83 Full) |
-| `requirements.md` | — | Current | Detailed requirements with user stories and acceptance criteria for all 11 categories |
+| `feature-list.md` | — | Current | Comprehensive feature list (134 features, 45 MVP / 89 Full) |
+| `requirements.md` | — | Current | Detailed requirements with user stories and acceptance criteria for all 12 categories |
 | `activity.md` | — | Current | Iteration tracking (this file) |
